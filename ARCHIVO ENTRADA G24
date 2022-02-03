@@ -1,0 +1,380 @@
+/*----------------------------------------B A S I C O S----------------------------------------*/
+
+
+//A R I T M E T I C A
+
+declare function local:aritmeticas($valor1 as xs:decimal?,$valor2 as xs:decimal?)
+as xs:decimal?
+{
+let $resultado := ($valor1 * $valor2) div 100
+
+return $resultado
+};
+
+local:aritmeticas(100,200)
+
+	//SALIDA
+	200
+
+
+
+//R E L A C I O N A L 
+
+declare function local:relacional($valor1 as xs:decimal?,$valor2 as xs:decimal?)
+as xs:boolean?
+{
+let $resultado := ($valor1 eq $valor2) eq ($valor1 ne $valor2)
+let $resultado2 := ($valor1 gt $valor2) != ($valor1 lt $valor2)
+
+return $resultado eq $resultado2
+};
+
+local:relacional(100,200)
+
+	//SALIDA
+	false
+
+
+
+//L O G I C A
+
+declare function local:logicas($valor1 as xs:decimal?)
+as xs:decimal?
+{
+
+if($valor1 > 1 and $valor1 lt 10) then $valor1*10
+else if($valor1 eq 10 or $valor1 eq 20) then ($valor1 div 2)
+else $valor1
+
+};
+
+local:logicas(1)
+
+	//SALIDA
+	1
+
+/*----------------------------------------I N T E R M E D I A S----------------------------------------*/
+Consulta 1  (Archivos Discos)
+
+    for $x in /CATALOG/CD/PRICE/../../CD
+    where $x/price=25.10 or $x/price=25.20 
+    order by $x/title
+    return $x/title
+
+    NUESTRA:
+    for $x in /CATALOG/CD/TITLE
+    where $x/PRICE = 25.20
+    return $x
+
+    SALIDA: 
+        <TITLE>"Esto tiene que salir bien"</TITLE>
+        <TITLE>'Esto tiene que salir muy bien tambien'</TITLE>
+        <TITLE>Eros & Eros</TITLE>
+
+
+
+Consulta 2 (Archivo Discos)
+
+    let $x := /catalog/cd/country
+    return $x
+
+    SALIDA:
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>EU</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>EU</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>EU</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>Norway</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>EU</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+        <COUNTRY>EU</COUNTRY>
+        <COUNTRY>UK</COUNTRY>
+        <COUNTRY>USA</COUNTRY>
+
+
+
+Consulta 3
+    for $x in (10,20), $y in (100,200)
+    return x=$x and y=$y
+
+    SALIDA:
+        x=10 and y=100
+        x=10 and y=200
+        x=20 and y=100
+        x=20 and y=200
+
+
+
+Consulta 4
+    for $x in (1 to 5)
+    return $x
+
+    SALIDA:
+        $1
+        $2
+        $3
+        $4
+        $5
+
+
+
+Consulta 5 (Archivo Libros)
+    for $x in /catalog/book
+        return if ($x/@id="bk101")
+        then <child>{data($x/title)}</child>
+        else <adult>{data($x/title)}</adult>
+
+LA NUESTRA:
+ for $x in /catalog/book/title
+        return $x
+
+    SALIDA:
+        <child>XML Developer&apos;s Guide</child>
+        <child>Midnight Rain</child>
+        <child>Maeve Ascendant</child>
+        <child>Oberon&apos;s Legacy</child>
+        <adult>The Sundered Grail</adult>
+        <adult>Lover Birds</adult>
+        <adult>Splish Splash</adult>
+        <child>Creepy Crawlies</child>
+        <adult>Paradox Lost</adult>
+        <adult>Microsoft .NET: The Programming Bible</adult>
+        <adult>MSXML3: A Comprehensive Guide</adult>
+        <child>Visual Studio 7: A Comprehensive Guide</child>
+
+
+ 
+ Consulta 6  (Archivo Libros)
+
+    for $x at $i in /catalog/book
+    order by $x/@id, $x/title
+    return <libro>{$i}. {data($x/title)}</libro>
+
+LA NUESTRA:
+ for $x in /catalog/book/title
+        order by $x/title
+        return $x
+
+    SALIDA:
+        <libro>8. Creepy Crawlies</libro>
+        <libro>3. Maeve Ascendant</libro>
+        <libro>2. Midnight Rain</libro>
+        <libro>4. Oberon&apos;s Legacy</libro>
+        <libro>12. Visual Studio 7: A Comprehensive Guide</libro>
+        <libro>1. XML Developer&apos;s Guide</libro>
+        <libro>5. The Sundered Grail</libro>
+        <libro>6. Lover Birds</libro>
+        <libro>7. Splish Splash</libro>
+        <libro>9. Paradox Lost</libro>
+        <libro>10. Microsoft .NET: The Programming Bible</libro>
+        <libro>11. MSXML3: A Comprehensive Guide</libro>
+
+
+
+/*----------------------------------------F  U  N  C  I  O  N  E  S----------------------------------------*/
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<recursivas>
+   <fact>7</fact>
+   <fibo>17</fibo>
+	<ack1>3</ack1>
+  	<ack2>4</ack2>
+</recursivas>
+
+
+//F A C T O R I A L
+
+declare function local:funcionx1($int as xs:integer ) as xs:double{
+    if ($int gt 1) then $int * local:funcionx1($int - 1) else 1
+};
+
+local:funcionx1(/recursivas/fact)
+
+	SALIDA:
+	 125
+
+
+
+//F I B O N A C C I
+
+declare function local:funcionx2($num as xs:integer) as xs:integer {
+    if ($num eq 0) then 0
+    else if ($num eq 1) then 1
+    else (local:funcionx2($num - 1) + local:funcionx2($num - 2))
+};
+
+local:funcionx2(/recursivas/fibo)
+
+	SALIDA:
+	5040
+
+
+
+
+//A C K E R M A N
+
+declare function local:funcionx3($m as xs:integer,$n as xs:integer) as xs:integer
+{
+  if ($m = 0) then $n+1
+  else if ($m gt 0 and $n=0) then local:funcionx3($m -1 , 1) 
+  else local:funcionx3($m - 1, local:funcionx3($m, $n - 1))
+};
+	
+local:funcionx3(/recursivas/ack1,/recursivas/ack2)
+
+	SALIDA:
+	1597
+
+
+/*----------------------------------------O  P  T  I  M  I  Z  A  C  I  O  N----------------------------------------*/
+#include <stdio.h>
+#include <math.h>
+double heap[30101999];
+double stack[30101999];
+double sp;
+double hp;
+double $t1, $t2, $t3, $t4, $t5, $t6, $t7, $t8, $t9, $t10;
+
+
+
+void Caso3(){
+
+if (1 == 1) goto L1;
+goto L2;
+L2: 
+hp = hp + 1;
+L1:
+return;
+}
+
+
+void Caso4(){
+
+if (6 == 1) goto L1; 
+goto L2;
+L2:
+hp = hp + 1;
+L1:
+return;
+}
+
+
+void main(){
+
+  /* CASO 1
+  goto L1; 
+  <instrucciones> L1: 
+  */
+  goto L1; 
+  $t1 = $t1 + 1;
+  $t2 = $t1;
+  L1: 
+  $t3 = $t1 + $t3; 
+  
+  /* CASO 2
+    If (x == x) goto L1; 
+    goto L2; 
+    */
+   if ($t1 == $t1) goto L2; 
+   goto L3; 
+   L2: 
+  hp = hp + 1;
+  sp = sp + 1;  
+  L3: 
+  hp = hp + 2;
+  sp = sp + 2;
+
+ /* CASO 3 
+ If (1 == 1) goto L1; 
+        goto L2;
+     */
+
+  if (1 == 1) goto L4; 
+  goto L5; 
+  L4:
+  hp = hp + 1;
+  L5:
+  hp = hp +2;
+
+   /* CASO 4 
+ If (6 == 1) goto L1; 
+        goto L2;
+     */
+
+  if (1 == 1) goto L6; 
+  goto L7; 
+  L6:
+  hp = hp + 1;
+  L7:
+  hp = hp +2;
+
+  /* CASO 5
+    $t3 = $t2; 
+    <instrucciones> 
+    $t2 = $t3;    
+    */
+
+   $t6 = $t7;
+   hp = hp + 1;
+   sp = sp + 1;
+   $t7 = $t6;
+
+  /* CASO 6
+  $t1 = $t1 + 0*/
+  $t6 = $t6 + 0;
+
+  /* CASO 7
+  $t1 = $t1 - 0*/
+  $t7 = $t7 - 0;
+
+   /* CASO 8
+  $t1 = $t1 * 1 */
+  $t6 = $t6 * 1;
+
+  /* CASO 9
+  $t1 = $t1 / 1 */
+  $t7 = $t7 / 1;
+
+   /* CASO 10
+  $t1 = $t2 + 0*/
+  $t10 = $t9 + 0;
+
+  /* CASO 11
+  $t1 = $t2 - 0*/
+  $t3 = $t5 - 0; 
+
+   /* CASO 12
+  $t1 = $t2 * 1*/
+  $t10 = $t9 * 1;
+
+  /* CASO 13
+  $t1 = $t2 / 1*/
+  $t3 = $t5 / 1; 
+
+   /* CASO 14
+  $t1 = $t2 * 1*/
+  $t10 = $t9 * 2;
+
+  /* CASO 15
+  $t1 = $t2 / 1*/
+  $t3 = $t5 * 0; 
+
+  /* CASO 15
+  $t1 = 0 / $t7*/
+  $t1 = 0 / $t7; 
+
+}
